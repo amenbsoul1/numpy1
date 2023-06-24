@@ -12,14 +12,14 @@ def euler(f, a: float, b: float, initial_cond: float, N=None, h=None):
     else:
         h = (b - a) / N
 
-    t_i = np.linspace(a, b, N + 1)
+    time_i = np.linspace(a, b, N + 1)
     y_i = np.zeros(N + 1)
     y_i[0] = initial_cond
 
     for i in range(N):
-        last_t = t_i[i]
+        last_time = time_i[i]
         last_y = y_i[i]
-        t_i[i + 1] = last_t + h
-        y_i[i + 1] = last_y + h * f(last_t, last_y)
+        time_i[i + 1] = last_time + h
+        y_i[i + 1] = last_y + h * f(last_time, last_y)
 
-    return t_i, y_i
+    return time_i, y_i
