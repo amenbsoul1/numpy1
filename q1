@@ -1,25 +1,55 @@
 import numpy as np
-
-
+from matplotlib import pyplot as plt
 def euler(f, a: float, b: float, initial_cond: float, N=None, h=None):
-    if N is None and h is None:
-        raise ValueError("Either N or h must be provided.")
-    elif N is not None and h is not None:
-        if h != (b - a) / N:
-            raise ValueError("Step size h is inconsistent with the interval [a, b].")
+    if N==None and h==None:
+        raise ValueError("not good2")
+    elif N!=None and h!=None:
+        if h!=(b-a)/N:
+            raise ValueError("not good3")
     elif N is None:
-        N = int((b - a) / h)
+        N=(b-a)/h
     else:
-        h = (b - a) / N
-
-    time_i = np.linspace(a, b, N + 1)
-    y_i = np.zeros(N + 1)
+        h=(b-a)/N
+    t_i=np.zeros(int(N)+1)
+    y_i=np.zeros((int(N)+1))
+    t_i[0] = a
     y_i[0] = initial_cond
+    for i in range(int(N)):
+        last_t=t_i[i]
+        last_y=y_i[i]
+        t_i[i+1]=last_t+h
+        y_i[i+1]=last_y+h*f(last_t,last_y)
+    return t_i,y_i
 
-    for i in range(N):
-        last_time = time_i[i]
-        last_y = y_i[i]
-        time_i[i + 1] = last_time + h
-        y_i[i + 1] = last_y + h * f(last_time, last_y)
 
-    return time_i, y_i
+
+
+def plot_funcs(t, y, y_exact=None):
+    plt.figure()  # initialize new figure object
+    x=t
+    exact=np.zeros(len(t))
+    for i in range(len(t)):
+        exact[i]=y_exact(t[i])
+    z=exact
+    plt.plot(x,y,color="green",label="approximate")
+    plt.plot(x,z,color="blue",ls='--',label='exact')
+    plt.title('Solution with Eules\'s methods')
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.legend()
+    fig = plt.gcf()  # get current figure, save in variable
+    return fig
+
+
+def plot_error(t, y, y_exact):
+    plt.figure()  # initialize new figure object
+    exact = np.zeros(len(t))
+    for i in range(len(t)):
+        exact[i] = y_exact(t[i])
+    a=abs(y-exact)
+    plt.plot(t,a,color='blue')
+    plt.title("hh")
+    plt.xlabel('t')
+    plt.ylabel('yyy')
+    fig = plt.gcf()  # get current figure, save in variable
+    return fig
