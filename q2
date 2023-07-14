@@ -1,0 +1,67 @@
+import numpy as np
+from skimage import data
+from skimage.color import rgb2gray
+
+def gep(x, u, s):
+    return -((x - u) ** 2) / (2 * (s ** 2))
+
+
+def guassian_dev(x, y, std_x, std_y, mean_x, mean_y):
+    return np.exp(gep(x, mean_x, std_x) + gep(y, mean_y, std_y)) \
+        / (std_x * std_y * 2 * np.pi)
+def gaussian_kernel(row, col, mean_v=0, std_v=None, mean_h=0, std_h=None):
+
+    kernel = np.zeros((row, col))
+    half_x=col//2
+    half_y=row//2
+    for x in range(0, row):
+        for y in range(0, col):
+            kernel[y, x] = guassian_dev(x-half_x, y-half_y, std_x=std_h,std_y=std_v, mean_x=mean_h , mean_y=mean_v)
+    return kernel
+
+
+
+def gaussian_blur(image, g_ker):
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = g_ker.shape
+
+    pad_height = kernel_height // 2
+    pad_width = kernel_width // 2
+
+    output = np.zeros_like(image,dtype=float)
+
+    padded_image = np.pad(image, ((0, pad_height), (0, pad_width)), mode='constant',constant_values=(0,0))
+
+    # Perform convolution
+    for i in range(image_height):
+        for j in range(image_width):
+            # Extract the region of interest
+
+            region = padded_image[i:i + kernel_height, j:j + kernel_width]
+
+            # Apply the kernel
+            output[i, j] = np.sum(region * g_ker)
+            
+
+    return output
+
+def gaussian_blur(image, g_ker):
+
+    rows = image.shape[0]
+    cols = image.shape[1]
+
+    image_result = np.zeros_like(image, dtype=float)
+
+    kernel_rows = g_ker.shape[0]
+    kernel_cols = g_ker.shape[1]
+
+    for y in range(0, rows):
+        for x in range(0, cols):
+            pixel_sum = 0
+            for r in range(0, kernel_rows):
+                for c in range(0, kernel_cols):
+                    if (x + c >= cols) or (y + r >= rows):
+                        continue
+                    pixel_sum += g_ker[r, c] * image[y + r, x + c]
+                    image_result[y, x] = pixel_sum
+    return image_result
